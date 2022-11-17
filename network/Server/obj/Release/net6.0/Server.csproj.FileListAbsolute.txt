@@ -1,0 +1,30 @@
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\bin\Release\net6.0\Server.exe
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\bin\Release\net6.0\Server.deps.json
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\bin\Release\net6.0\Server.runtimeconfig.json
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\bin\Release\net6.0\Server.dll
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\bin\Release\net6.0\Server.pdb
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.csproj.AssemblyReference.cache
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.AssemblyInfoInputs.cache
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.AssemblyInfo.cs
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.csproj.CoreCompileInputs.cache
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.dll
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\refint\Server.dll
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.pdb
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\Server.genruntimeconfig.cache
+C:\Users\Young\Downloads\BroadcastConsole\BroadcastConsole\Server\obj\Release\net6.0\ref\Server.dll
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\bin\Release\net6.0\Server.exe
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\bin\Release\net6.0\Server.deps.json
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\bin\Release\net6.0\Server.runtimeconfig.json
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\bin\Release\net6.0\Server.dll
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\bin\Release\net6.0\Server.pdb
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.csproj.AssemblyReference.cache
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.GeneratedMSBuildEditorConfig.editorconfig
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.AssemblyInfoInputs.cache
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.AssemblyInfo.cs
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.csproj.CoreCompileInputs.cache
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.dll
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\refint\Server.dll
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.pdb
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\Server.genruntimeconfig.cache
+D:\OneDrive_Mine\OneDrive - 한국성서대학교\수업\2학기 네트워크프로그래밍\C#_exCode\AsyncAwait\5AsyncBroadcast\Server\obj\Release\net6.0\ref\Server.dll
