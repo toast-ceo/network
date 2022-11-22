@@ -103,10 +103,11 @@ namespace AClient
             dataID = Encoding.Unicode.GetBytes(jsonManager);
             clientSocket.Send(dataID);
 
-            // 보내는 부분
-            Console.WriteLine("다음과 같은 포맷으로 메세지를 입력하세요\nex) 명령어! 보내고 싶은 메시지");
+         
             do
             {
+                // 보내는 부분
+                Console.WriteLine("다음과 같은 포맷으로 메세지를 입력하세요\nex) 명령어! 보내고 싶은 메시지");
                 byte[] data;
                 string msg = Console.ReadLine()!;
                 string[] tokens = msg.Split('!');
@@ -126,16 +127,16 @@ namespace AClient
                 /*    else if (tokens[0].Equals("File"))
                     {
                         SendFile(tokens[1]);
-                    }*//*
-                    else //  (tokens[0].Equals("TO"))
-                    {
-                        //
-                        m = "TO:" + nameID + ":" + tokens[0] + ":" + tokens[1] + ":";
-                        data = Encoding.Unicode.GetBytes(m);
-                        Console.WriteLine("[{0}에게 전송]:{1}", tokens[0], tokens[1]);
-                        try { ClientSocket.Send(data); } catch { }
-                    }
-    */
+                    }*/
+                else if (tokens[0].Equals("TO"))
+                {
+                    
+                    m = "TO:" + nameID + ":" + tokens[0] + ":" + tokens[1] + ":";
+                    data = Encoding.Unicode.GetBytes(m);
+                    Console.WriteLine("[{0}에게 전송]:{1}", tokens[0], tokens[1]);
+                    try { ClientSocket.Send(data); } catch { }
+                }
+
             } while (true);
         }
         void UserSend()

@@ -178,14 +178,21 @@ namespace AServer
 
             else if (clientBody.commend == "BR")
             {
-                Console.WriteLine(m);
-                /*//
-                fromID = tokens[1].Trim();
-                string msg = tokens[2];
-                Console.WriteLine("[전체]{0}:{1}", fromID, msg);
-                //
-                Broadcast(s, m);
-                s.Send(Encoding.Unicode.GetBytes("BR_Success:"));*/
+                if(clientBody.roll == "manager")
+                {
+                    msg = clientBody.message;
+                    Console.WriteLine("[전체]: {0}", msg);
+                    UserBroadcast(s, msg);
+                    s.Send(Encoding.Unicode.GetBytes("BR_Success: Manager"));
+                }
+                else if (clientBody.roll == "user")
+                {
+                    msg = clientBody.message;
+                    Console.WriteLine("[전체]: {0}", msg);
+                    ManagerBroadcast(s, m);
+                    s.Send(Encoding.Unicode.GetBytes("BR_Success: User"));
+                }
+
             }
 
             else if (code.Equals("TO"))
@@ -249,6 +256,44 @@ namespace AServer
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
             //
             foreach (KeyValuePair<string, Socket> client in connectedClients.ToArray())
+            {
+                try
+                {
+                    //5-2 send
+                    //
+                    if (s != client.Value)
+                        client.Value.Send(bytes);
+                }
+                catch (Exception)
+                {
+                    Disconnected(client.Value);
+                }
+            }
+        }
+        void UserBroadcast(Socket s, string msg) // 5-2ㅡ모든 클라이언트에게 Send
+        {
+            byte[] bytes = Encoding.Unicode.GetBytes(msg);
+            //
+            foreach (KeyValuePair<string, Socket> client in connectedUsers.ToArray())
+            {
+                try
+                {
+                    //5-2 send
+                    //
+                    if (s != client.Value)
+                        client.Value.Send(bytes);
+                }
+                catch (Exception)
+                {
+                    Disconnected(client.Value);
+                }
+            }
+        }
+        void ManagerBroadcast(Socket s, string msg) // 5-2ㅡ모든 클라이언트에게 Send
+        {
+            byte[] bytes = Encoding.Unicode.GetBytes(msg);
+            //
+            foreach (KeyValuePair<string, Socket> client in connectedManagers.ToArray())
             {
                 try
                 {
