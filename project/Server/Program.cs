@@ -148,10 +148,8 @@ namespace AServer
             var clientBody  = JsonConvert.DeserializeObject<ClientService>(m);
             string msg;
 
-            string[] tokens = m.Split(':');
             string fromID;
             string toID;
-            string code = tokens[0];
 
             
             if (clientBody.commend == "ID")
@@ -185,6 +183,7 @@ namespace AServer
                     UserBroadcast(s, msg);
                     s.Send(Encoding.Unicode.GetBytes("BR_Success: Manager"));
                 }
+                
                 else if (clientBody.roll == "user")
                 {
                     msg = clientBody.message;
@@ -195,22 +194,24 @@ namespace AServer
 
             }
 
-            else if (code.Equals("TO"))
+            else if (clientBody.commend == "TO")
             {
-                fromID = tokens[1].Trim();
-                toID = tokens[2].Trim();
-                msg = tokens[3];
-                string rMsg = "[From:" + fromID + "][TO:" + toID + "]" + msg;
-                Console.WriteLine(rMsg);
-
-                //
-                SendTo(toID, m);
-                s.Send(Encoding.Unicode.GetBytes("To_Success:"));
+                if(clientBody.roll == "manager")
+                {
+                    fromID = clientBody.id;
+                    toID = clientBody.Toid;
+                    msg = clientBody.message;
+                    string rMsg = "[From:" + fromID + "]" + msg;
+                    Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
+                    SendTo(toID, rMsg);
+                    s.Send(Encoding.Unicode.GetBytes("To_Success:"));
+                }
+                
             }
-            else if (code.Equals("File"))
+           /* else if (code.Equals("File"))
             {
                 ReceiveFile(s, m);
-            }
+            }*/
             else
             {
                 Broadcast(s, m);
@@ -243,6 +244,7 @@ namespace AServer
         {
             Socket socket;
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
+            Console.WriteLine(id);
             if (connectedClients.ContainsKey(id))
             {
                 //
@@ -251,7 +253,7 @@ namespace AServer
             }
         }
         
-        void Broadcast(Socket s, string msg) // 5-2ㅡ모든 클라이언트에게 Send
+        void Broadcast(Socket s, string msg) // 모든 클라이언트에게 Send
         {
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
             //
@@ -270,7 +272,7 @@ namespace AServer
                 }
             }
         }
-        void UserBroadcast(Socket s, string msg) // 5-2ㅡ모든 클라이언트에게 Send
+        void UserBroadcast(Socket s, string msg) // 유저 클라이언트에게 Send
         {
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
             //
@@ -289,7 +291,7 @@ namespace AServer
                 }
             }
         }
-        void ManagerBroadcast(Socket s, string msg) // 5-2ㅡ모든 클라이언트에게 Send
+        void ManagerBroadcast(Socket s, string msg) // 매니저 클라이언트에게 Send
         {
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
             //
@@ -316,6 +318,7 @@ namespace AServer
         public string roll { get; set; }
         public string commend { get; set; }
         public string message { get; set; }
+        public string Toid { get; set; }
 
     }
 
