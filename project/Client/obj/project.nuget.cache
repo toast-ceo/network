@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UfUvTnScZz2bR/LVm2+sqM/05YsGAHGj2fSOZxfbJZOKyxs6pOP8kc5t+GRLpwRkpWNwIFdYq0D/cnmD/rtr/g==",
+  "dgSpecHash": "fi1XwRiOgaRZx8ivPuKA4c0EKrlhR++bPRAthOkKOkkYtyYgntsZEoLnVCMcWZv/+q3G6lptPizJD8/xic1ehg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\issac\\source\\repos\\11 network\\Client\\Client.csproj",
+  "projectFilePath": "C:\\Users\\issac\\Documents\\GitHub\\network\\project\\Client\\Client.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

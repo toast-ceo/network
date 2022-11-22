@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\issac\\source\\repos\\11 network\\Client\\Client.csproj",
+      "projectUniqueName": "C:\\Users\\issac\\Documents\\GitHub\\network\\project\\Client\\Client.csproj",
       "projectName": "Client",
-      "projectPath": "C:\\Users\\issac\\source\\repos\\11 network\\Client\\Client.csproj",
+      "projectPath": "C:\\Users\\issac\\Documents\\GitHub\\network\\project\\Client\\Client.csproj",
       "packagesPath": "C:\\Users\\issac\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\issac\\source\\repos\\11 network\\Client\\obj\\",
+      "outputPath": "C:\\Users\\issac\\Documents\\GitHub\\network\\project\\Client\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\issac\\AppData\\Roaming\\NuGet\\NuGet.Config",

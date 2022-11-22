@@ -1,6 +1,12 @@
 ﻿using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using System;
+using System.Net.Http.Json;
+using Newtonsoft.Json;
 
 namespace AServer
 {
@@ -22,11 +28,23 @@ namespace AServer
 
 
         private Dictionary<string, Socket> connectedClients = new();
+        private Dictionary<string, Socket> connectedUsers = new();
+        private Dictionary<string, Socket> connectedManagers = new();
 
         public Dictionary<string, Socket> ConnectedClients
         {
             get => connectedClients;
             set => connectedClients = value;
+        }
+        public Dictionary<string, Socket> ConnectedUsers
+        {
+            get => connectedUsers;
+            set => connectedUsers = value;
+        }
+        public Dictionary<string, Socket> ConnectedManagers
+        {
+            get => connectedManagers;
+            set => connectedManagers = value;
         }
 
         private Socket ServerSocket;
@@ -82,6 +100,20 @@ namespace AServer
                     clientNum--;
                 }
             }
+            foreach (KeyValuePair<string, Socket> clients in connectedManagers)
+            {
+                if (clients.Value == client)
+                {
+                    ConnectedManagers.Remove(clients.Key);
+                }
+            }
+            foreach (KeyValuePair<string, Socket> clients in connectedUsers)
+            {
+                if (clients.Value == client)
+                {
+                    ConnectedUsers.Remove(clients.Key);
+                }
+            }
             client.Disconnect(false);
             client.Close();
         }
@@ -90,13 +122,12 @@ namespace AServer
         {
             Socket client = (Socket)sender!;
             byte[] data = new byte[BufferSize];
+          
             try
             {
                 int n = client.Receive(data);
                 if (n > 0)
                 {
-
-                    //
                     MessageProc(client, data);
 
                     SocketAsyncEventArgs argsR = new SocketAsyncEventArgs();
@@ -114,37 +145,54 @@ namespace AServer
         void MessageProc(Socket s, byte[] bytes)
         {
             string m = Encoding.Unicode.GetString(bytes);
-            //
+            var clientBody  = JsonConvert.DeserializeObject<ClientService>(m);
+            string msg;
+
             string[] tokens = m.Split(':');
             string fromID;
             string toID;
             string code = tokens[0];
 
-            if (code.Equals("ID"))
+            
+            if (clientBody.commend == "ID")
             {
                 clientNum++;
-                fromID = tokens[1].Trim();
+                fromID = clientBody.id;
                 Console.WriteLine("[접속{0}]ID:{1},{2}",
                     clientNum, fromID, s.RemoteEndPoint);
                 //
                 connectedClients.Add(fromID, s);
-                s.Send(Encoding.Unicode.GetBytes("ID_REG_Success:"));
-                Broadcast(s, m);
+                if(clientBody.roll == "manager")
+                {
+                    connectedManagers.Add(fromID, s);
+                }
+                else if(clientBody.roll == "user")
+                {
+                    connectedUsers.Add(fromID, s);
+                }
+                s.Send(Encoding.Unicode.GetBytes("연결이 성공했습니다!"));
+                msg = $"{clientBody.id}연결 접속됐습니다!";
+
+                Broadcast(s, msg);
             }
-            else if (tokens[0].Equals("BR"))
+
+            else if (clientBody.commend == "BR")
             {
+                Console.WriteLine(m);
+                /*//
                 fromID = tokens[1].Trim();
                 string msg = tokens[2];
                 Console.WriteLine("[전체]{0}:{1}", fromID, msg);
                 //
                 Broadcast(s, m);
-                s.Send(Encoding.Unicode.GetBytes("BR_Success:"));
+                s.Send(Encoding.Unicode.GetBytes("BR_Success:"));*/
             }
+
             else if (code.Equals("TO"))
             {
                 fromID = tokens[1].Trim();
                 toID = tokens[2].Trim();
-                string msg = tokens[3];
+                msg = tokens[3];
                 string rMsg = "[From:" + fromID + "][TO:" + toID + "]" + msg;
                 Console.WriteLine(rMsg);
 
@@ -195,6 +243,7 @@ namespace AServer
                 try { socket.Send(bytes); } catch { }
             }
         }
+        
         void Broadcast(Socket s, string msg) // 5-2ㅡ모든 클라이언트에게 Send
         {
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
@@ -207,7 +256,6 @@ namespace AServer
                     //
                     if (s != client.Value)
                         client.Value.Send(bytes);
-
                 }
                 catch (Exception)
                 {
@@ -217,4 +265,13 @@ namespace AServer
         }
 
     }
+    public class ClientService
+    {
+        public string id { get; set; }
+        public string roll { get; set; }
+        public string commend { get; set; }
+        public string message { get; set; }
+
+    }
+
 }
