@@ -92,14 +92,7 @@ namespace AServer
         void Disconnected(Socket client)
         {
             Console.WriteLine($"Client disconnected: {client.RemoteEndPoint}.");
-            foreach (KeyValuePair<string, Socket> clients in connectedClients)
-            {
-                if (clients.Value == client)
-                {
-                    ConnectedClients.Remove(clients.Key);
-                    clientNum--;
-                }
-            }
+  
             foreach (KeyValuePair<string, Socket> clients in connectedManagers)
             {
                 if (clients.Value == client)
@@ -112,6 +105,14 @@ namespace AServer
                 if (clients.Value == client)
                 {
                     ConnectedUsers.Remove(clients.Key);
+                }
+            }
+            foreach (KeyValuePair<string, Socket> clients in connectedClients)
+            {
+                if (clients.Value == client)
+                {
+                    ConnectedClients.Remove(clients.Key);
+                    clientNum--;
                 }
             }
             client.Disconnect(false);
@@ -151,7 +152,6 @@ namespace AServer
             string fromID;
             string toID;
 
-            
             if (clientBody.commend == "ID")
             {
                 clientNum++;
@@ -159,19 +159,28 @@ namespace AServer
                 Console.WriteLine("[접속{0}]ID:{1},{2}",
                     clientNum, fromID, s.RemoteEndPoint);
                 //
-                connectedClients.Add(fromID, s);
-                if(clientBody.roll == "manager")
+                try
                 {
-                    connectedManagers.Add(fromID, s);
-                }
-                else if(clientBody.roll == "user")
-                {
-                    connectedUsers.Add(fromID, s);
-                }
-                s.Send(Encoding.Unicode.GetBytes("연결이 성공했습니다!"));
-                msg = $"{clientBody.id}연결 접속됐습니다!";
+                    connectedClients.Add(fromID, s);
+                    if (clientBody.roll == "manager")
+                    {
+                        connectedManagers.Add(fromID, s);
+                    }
+                    else if (clientBody.roll == "user")
+                    {
+                        connectedUsers.Add(fromID, s);
+                    }
+                    s.Send(Encoding.Unicode.GetBytes("연결이 성공했습니다!"));
+                    msg = $"{clientBody.id}연결 접속됐습니다!";
 
-                Broadcast(s, msg);
+                    Broadcast(s, msg);
+                }
+                catch (ArgumentException)
+                {
+                    s.Send(Encoding.Unicode.GetBytes("ID! 이미 존재하는 아이디입니다. 다시 입력하세요."));
+                }
+              
+              
             }
 
             else if (clientBody.commend == "BR")
@@ -189,7 +198,7 @@ namespace AServer
                     msg = clientBody.message;
                     Console.WriteLine("[전체]: {0}", msg);
                     ManagerBroadcast(s, m);
-                    s.Send(Encoding.Unicode.GetBytes("BR_Success: User"));
+                    s.Send(Encoding.Unicode.GetBytes("매니저에게 BR를 요청했습니다."));
                 }
 
             }
@@ -203,10 +212,19 @@ namespace AServer
                     msg = clientBody.message;
                     string rMsg = "[From:" + fromID + "]" + msg;
                     Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
-                    SendTo(toID, rMsg);
+                    SendTo(clientBody.roll ,toID, rMsg);
                     s.Send(Encoding.Unicode.GetBytes("To_Success:"));
+                }else if (clientBody.roll == "user")
+                {
+                    fromID = clientBody.id;
+                    toID = clientBody.Toid;
+                    msg = clientBody.message;
+                    string rMsg = "[From:" + fromID + "]" + msg;
+                    Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
+                    SendTo(clientBody.roll, toID, rMsg);
+                    s.Send(Encoding.Unicode.GetBytes(fromID + "님에게 전송 완료"));
                 }
-                
+
             }
            /* else if (code.Equals("File"))
             {
@@ -240,17 +258,33 @@ namespace AServer
             }
             fs.Close(); 
         }
-        void SendTo(string id, string msg)
+        void SendTo(string roll, string id, string msg)
         {
             Socket socket;
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
             Console.WriteLine(id);
-            if (connectedClients.ContainsKey(id))
+            if (roll == "manager")
             {
-                //
-                connectedClients.TryGetValue(id, out socket!);
-                try { socket.Send(bytes); } catch { }
-            }
+                if (connectedClients.ContainsKey(id))
+                {
+                    //
+                    connectedClients.TryGetValue(id, out socket!);
+                    try { socket.Send(bytes); } catch { }
+                }
+            }else if (roll == "user")
+                {
+                if (connectedUsers.ContainsKey(id))
+                {
+                    //
+                    connectedUsers.TryGetValue(id, out socket!);
+                    try { socket.Send(bytes); } catch { }
+                }
+                else
+                {
+                    Console.WriteLine("해당 유저가 없습니다");
+                }
+                }
+
         }
         
         void Broadcast(Socket s, string msg) // 모든 클라이언트에게 Send
