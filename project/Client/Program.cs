@@ -71,10 +71,13 @@ namespace AClient
                 string str = Encoding.Unicode.GetString(data);
                 str = str.Replace("\0", "");
                 string[] tokens = str.Split('!');
-                if (tokens[0] == "ID")
+                if (tokens[0].Trim() == "ID")
                 {
                     Console.WriteLine("수신:" + tokens[1]);
                     nameID = "";
+                } else if (tokens[0].Trim() == "BR")
+                {
+                    
                 }
                 else
                 {

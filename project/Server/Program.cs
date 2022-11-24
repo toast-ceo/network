@@ -195,9 +195,10 @@ namespace AServer
                 
                 else if (clientBody.roll == "user")
                 {
-                    msg = clientBody.message;
+                    msg =  clientBody.commend +"!"+ clientBody.id + "!" + clientBody.message;
+                    Console.WriteLine(msg);
                     Console.WriteLine("[전체]: {0}", msg);
-                    ManagerBroadcast(s, m);
+                    ManagerBroadcast(s, msg);
                     s.Send(Encoding.Unicode.GetBytes("매니저에게 BR를 요청했습니다."));
                 }
 
