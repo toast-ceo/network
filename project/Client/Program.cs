@@ -11,6 +11,7 @@ namespace AClient
     public class Client
     {
         private readonly static int BufferSize = 4096;
+        Dictionary<string, string> UserBR = new Dictionary<string, string>(); 
 
         public static void Main()
         {
@@ -77,7 +78,8 @@ namespace AClient
                     nameID = "";
                 } else if (tokens[0].Trim() == "BR")
                 {
-                    
+                    UserBR.Add(tokens[1].Trim(), tokens[2].Trim());
+                    Console.WriteLine("["+ tokens[1] + "]님이 "+ tokens[2] + "메세지를 요청했습니다.\nEX) AC! 해당 닉네임! 의 형식으로 요청을 수락해주세요"  );
                 }
                 else
                 {
@@ -144,7 +146,13 @@ namespace AClient
                 }
                 else if (tokens[0].Equals("AC"))
                 {
+                    ClientService managerBR = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = UserBR[tokens[1].Trim()] };
+                    jsonManager = JsonSerializer.Serialize(managerBR, jso);
 
+                    Console.WriteLine(jsonManager);
+                    data = Encoding.Unicode.GetBytes(jsonManager);
+                    Console.WriteLine("[AC 전송]{0}", tokens[1]);
+                    try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
                 }
                 /*    else if (tokens[0].Equals("File"))
                     {
@@ -206,12 +214,12 @@ namespace AClient
 
                 else if (tokens[0].Equals("BR"))
                 {
-                    ClientService managerBR = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = tokens[1].Trim() };
-                    jsonUser = JsonSerializer.Serialize(managerBR, jso);
+                    ClientService UserBR = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = tokens[1].Trim() };
+                    jsonUser = JsonSerializer.Serialize(UserBR, jso);
 
                     Console.WriteLine(jsonUser);
                     data = Encoding.Unicode.GetBytes(jsonUser);
-                    Console.WriteLine("[전체전송]{0}", tokens[2]);
+                    Console.WriteLine("[BR 요청]{0}", tokens[1]);
                     try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
                 }
                 /*    else if (tokens[0].Equals("File"))
