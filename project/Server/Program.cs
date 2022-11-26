@@ -118,6 +118,7 @@ namespace AServer
             client.Disconnect(false);
             client.Close();
         }
+        string bMsg;
 
         void Received(object? sender, SocketAsyncEventArgs e)
         {
@@ -196,70 +197,63 @@ namespace AServer
                 else if (clientBody.roll == "user")
                 {
                     msg =  clientBody.commend +"!"+ clientBody.id + "!" + clientBody.message;
-                    Console.WriteLine(msg);
                     Console.WriteLine("[전체]: {0}", msg);
                     ManagerBroadcast(s, msg);
                     s.Send(Encoding.Unicode.GetBytes("매니저에게 BR를 요청했습니다."));
                 }
 
             }
-
+            else if (clientBody.commend == "AC")
+            {
+                msg = clientBody.message;
+                Console.WriteLine("[전체]: {0}", msg);
+                UserBroadcast(s, msg);
+                s.Send(Encoding.Unicode.GetBytes("AC_Success: Manager"));
+            }
             else if (clientBody.commend == "TO")
             {
                 if(clientBody.roll == "manager")
+                
                 {
                     fromID = clientBody.id;
                     toID = clientBody.Toid;
                     msg = clientBody.message;
                     string rMsg = "[From:" + fromID + "]" + msg;
                     Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
-                    SendTo(clientBody.roll ,toID, rMsg);
+                    SendTo(s, clientBody.roll ,toID, rMsg);
                     s.Send(Encoding.Unicode.GetBytes("To_Success:"));
-                }else if (clientBody.roll == "user")
+                }
+                
+                else if (clientBody.roll == "user")
+                
                 {
                     fromID = clientBody.id;
                     toID = clientBody.Toid;
                     msg = clientBody.message;
+
                     string rMsg = "[From:" + fromID + "]" + msg;
+                    bMsg = $"{clientBody.commend}!{clientBody.roll}!{toID}!{fromID}!{msg}";
                     Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
-                    SendTo(clientBody.roll, toID, rMsg);
-                    s.Send(Encoding.Unicode.GetBytes(fromID + "님에게 전송 완료"));
+                    
+                    SendTo(s, clientBody.roll, toID, rMsg);
+                    ManagerBroadcast(s, bMsg);
+                    
                 }
 
             }
-           /* else if (code.Equals("File"))
+            
+            /*else if (clientBody.commend == "IF")
             {
-                ReceiveFile(s, m);
-            }*/
+                s.Send(Encoding.Unicode.GetBytes(d));
+            }
+            */
             else
             {
                 Broadcast(s, m);
             }
         }
-        void ReceiveFile(Socket s, string m)
-        {
-            string output_path = "FileDown";
-            if (!Directory.Exists(output_path))
-            {
-                Directory.CreateDirectory(output_path); 
-            }
-            string[] tokens = m.Split(':');
-            string fileName = tokens[1].Trim();
-            long fileLength = Convert.ToInt64(tokens[2].Trim());
-            string FileDest = output_path +fileName;
-
-            long flen = 0;
-            FileStream fs = new FileStream(FileDest, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
-            while(flen < fileLength)
-            {
-                byte[] fdata = new byte[4096];
-                int r = s.Receive(fdata, 0, 4096, SocketFlags.None);
-                fs.Write(fdata, 0, r);
-                flen += r;
-            }
-            fs.Close(); 
-        }
-        void SendTo(string roll, string id, string msg)
+       
+        void SendTo(Socket us, string roll, string id, string msg)
         {
             Socket socket;
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
@@ -278,11 +272,13 @@ namespace AServer
                 {
                     //
                     connectedUsers.TryGetValue(id, out socket!);
-                    try { socket.Send(bytes); } catch { }
+                    try { socket.Send(bytes); 
+                        us. Send(Encoding.Unicode.GetBytes("["+id+"]님에게 전송되었습니다."));
+                    } catch { }
                 }
                 else
                 {
-                    Console.WriteLine("해당 유저가 없습니다");
+                    us.Send(Encoding.Unicode.GetBytes("유저 정보가 없습니다."));
                 }
                 }
 

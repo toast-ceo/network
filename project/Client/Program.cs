@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,9 +10,10 @@ using System.Text.Json.Nodes;
 namespace AClient
 {
     public class Client
+
     {
         private readonly static int BufferSize = 4096;
-        Dictionary<string, string> UserBR = new Dictionary<string, string>(); 
+        Dictionary<string, string> UserBRD = new Dictionary<string, string>(); 
 
         public static void Main()
         {
@@ -78,8 +80,12 @@ namespace AClient
                     nameID = "";
                 } else if (tokens[0].Trim() == "BR")
                 {
-                    UserBR.Add(tokens[1].Trim(), tokens[2].Trim());
-                    Console.WriteLine("["+ tokens[1] + "]님이 "+ tokens[2] + "메세지를 요청했습니다.\nEX) AC! 해당 닉네임! 의 형식으로 요청을 수락해주세요"  );
+                    UserBRD.Add(tokens[1].Trim(), tokens[2].Trim());
+                    Console.WriteLine("["+ tokens[1].Trim() + "]님이 "+ tokens[2].Trim() + "메세지를 요청했습니다.\nEX) AC! 해당 닉네임! 의 형식으로 요청을 수락해주세요"  );
+                }
+                else if (tokens[0].Trim() == "TO" && tokens[1].Trim() == "user")
+                {
+                    Console.WriteLine("[" + tokens[2].Trim() + "->" + tokens[3].Trim() + "] : "+ tokens[4].Trim());
                 }
                 else
                 {
@@ -99,7 +105,7 @@ namespace AClient
 
         void ManagerSend()
         {
-
+            clearConsole();
             byte[] dataID;
             string r = "manager";
             string cd;
@@ -139,31 +145,25 @@ namespace AClient
                     ClientService managerBR = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = tokens[1].Trim() };
                     jsonManager = JsonSerializer.Serialize(managerBR, jso);
 
-                    Console.WriteLine(jsonManager);
                     data = Encoding.Unicode.GetBytes(jsonManager);
-                    Console.WriteLine("[전체전송]{0}", tokens[2]);
+                    Console.WriteLine("[전체전송]{0}", tokens[1]);
                     try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
                 }
                 else if (tokens[0].Equals("AC"))
                 {
-                    ClientService managerBR = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = UserBR[tokens[1].Trim()] };
-                    jsonManager = JsonSerializer.Serialize(managerBR, jso);
+                    ClientService managerAC = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = UserBRD[tokens[1].Trim()] };
+                    jsonManager = JsonSerializer.Serialize(managerAC, jso);
 
                     Console.WriteLine(jsonManager);
                     data = Encoding.Unicode.GetBytes(jsonManager);
                     Console.WriteLine("[AC 전송]{0}", tokens[1]);
                     try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
                 }
-                /*    else if (tokens[0].Equals("File"))
-                    {
-                        SendFile(tokens[1]);
-                    }
-                */
+  
                 else if (tokens[0].Equals("TO"))
                 {
                     ClientService managerTo = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), Toid = tokens[1].Trim(), message = tokens[2].Trim() };
                     jsonManager = JsonSerializer.Serialize(managerTo, jso);
-                    Console.WriteLine(jsonManager);
                     data = Encoding.Unicode.GetBytes(jsonManager);
                     Console.WriteLine("[{0}에게 전송]:{1}", tokens[1], tokens[2]);
                     try { ClientSocket.Send(data); } catch { }
@@ -177,6 +177,7 @@ namespace AClient
         }
         void UserSend()
         {
+            clearConsole();
             byte[] dataID;
             string r = "user";
             string cd;
@@ -217,23 +218,16 @@ namespace AClient
                     ClientService UserBR = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = tokens[1].Trim() };
                     jsonUser = JsonSerializer.Serialize(UserBR, jso);
 
-                    Console.WriteLine(jsonUser);
                     data = Encoding.Unicode.GetBytes(jsonUser);
                     Console.WriteLine("[BR 요청]{0}", tokens[1]);
                     try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
                 }
-                /*    else if (tokens[0].Equals("File"))
-                    {
-                        SendFile(tokens[1]);
-                    }
-                */
+       
                 else if (tokens[0].Equals("TO"))
                 {
-                    ClientService managerTo = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), Toid = tokens[1].Trim(), message = tokens[2].Trim() };
-                    jsonUser = JsonSerializer.Serialize(managerTo, jso);
-                    Console.WriteLine(jsonUser);
+                    ClientService UserTo = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), Toid = tokens[1].Trim(), message = tokens[2].Trim() };
+                    jsonUser = JsonSerializer.Serialize(UserTo, jso);
                     data = Encoding.Unicode.GetBytes(jsonUser);
-                    Console.WriteLine("[{0}에게 전송]:{1}", tokens[1], tokens[2]);
                     try { ClientSocket.Send(data); } catch { }
                 }
                 else
@@ -264,35 +258,32 @@ namespace AClient
                     Console.WriteLine("잘못 입력했습니다! 다음과 같은 형식으로 입력하세요! ex) 숫자 입력");
                 }
                 
-            } while (type == "0");
+            } while (type != "0");
             Console.WriteLine("프로그램을 종료합니다!");
          
         }
-
-        void SendFile(string filename)
+        void Information()
         {
-            FileInfo fi = new FileInfo(filename);   
-            string fileLength = fi.Length.ToString();
 
-            byte[] bDts = Encoding.Unicode.GetBytes
-                ("File:" + filename + ":" + fileLength + ":");
-            clientSocket.Send(bDts);
+            // JSON 직렬화 설정
+            JsonSerializerOptions jso = new JsonSerializerOptions();
+            jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+            jso.WriteIndented = true;
 
-            byte[] bDtsRx = new byte[4096];
-            // FileShare - 파일 공유 나혼자 
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None);
-            long received = 0;
-            while (received < fi.Length)
-            {
-                received += fs.Read(bDtsRx, 0, 4096);
-                clientSocket.Send(bDtsRx);
-                Array.Clear(bDtsRx); 
-            }
-            fs.Close();
-            Console.WriteLine("파일 송신 종료");
+
+            ClientService Info = new ClientService() {commend = "IF" };
+            String InfoD  = JsonSerializer.Serialize(Info, jso);
+
+            byte[] InfoByte = Encoding.Unicode.GetBytes(InfoD);
+            clientSocket.Send(InfoByte);
+        }
+        void clearConsole()
+        {
+            Console.Clear();
         }
 
     }
+  
     public class ClientService
     {
         public string id { get; set; }
