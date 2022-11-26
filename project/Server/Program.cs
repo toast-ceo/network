@@ -172,13 +172,13 @@ namespace AServer
                         connectedUsers.Add(fromID, s);
                     }
                     s.Send(Encoding.Unicode.GetBytes("연결이 성공했습니다!"));
-                    msg = $"{clientBody.id}연결 접속됐습니다!";
+                    msg = $"ID!{clientBody.id}!연결 접속됐습니다!";
 
                     Broadcast(s, msg);
                 }
                 catch (ArgumentException)
                 {
-                    s.Send(Encoding.Unicode.GetBytes("ID! 이미 존재하는 아이디입니다. 다시 입력하세요."));
+                    s.Send(Encoding.Unicode.GetBytes("IDC! 이미 존재하는 아이디입니다. 다시 입력하세요."));
                 }
               
               
@@ -242,11 +242,7 @@ namespace AServer
 
             }
             
-            /*else if (clientBody.commend == "IF")
-            {
-                s.Send(Encoding.Unicode.GetBytes(d));
-            }
-            */
+      
             else
             {
                 Broadcast(s, m);

@@ -74,11 +74,18 @@ namespace AClient
                 string str = Encoding.Unicode.GetString(data);
                 str = str.Replace("\0", "");
                 string[] tokens = str.Split('!');
+
+
                 if (tokens[0].Trim() == "ID")
                 {
+                    Console.WriteLine(tokens[1] + tokens[2]);
+                }
+                else if (tokens[0].Trim() == "IDC")
+                {
                     Console.WriteLine("수신:" + tokens[1]);
-                    nameID = "";
-                } else if (tokens[0].Trim() == "BR")
+                    nameID = null;
+                }
+                else if (tokens[0].Trim() == "BR")
                 {
                     UserBRD.Add(tokens[1].Trim(), tokens[2].Trim());
                     Console.WriteLine("["+ tokens[1].Trim() + "]님이 "+ tokens[2].Trim() + "메세지를 요청했습니다.\nEX) AC! 해당 닉네임! 의 형식으로 요청을 수락해주세요"  );
@@ -106,11 +113,13 @@ namespace AClient
         void ManagerSend()
         {
             clearConsole();
+            Console.WriteLine("ID를 먼저 입력해주세요!");
+
             byte[] dataID;
             string r = "manager";
             string cd;
             string jsonManager;
-            nameID = "";
+            nameID = null;
 
 
             // JSON 직렬화 설정
@@ -120,17 +129,20 @@ namespace AClient
 
             do
             {
-                // 보내는 부분
-                Console.WriteLine($"매니저 {nameID}님 방갑습니다!\n다음과 같은 포맷으로 메세지를 입력하세요\nex) 명령어! 보내고 싶은 메시지\n");
+  
                 byte[] data;
                 string msg = Console.ReadLine()!;
                 string[] tokens = msg.Split('!');
                 string m;
-
+                if (nameID != null)
+                {
+                    // 보내는 부분
+                    Console.WriteLine($"매니저 {nameID}님 방갑습니다!\n다음과 같은 포맷으로 메세지를 입력하세요\nex) 명령어! 보내고 싶은 메시지\n");
+                   
+                }
 
                 if (tokens[0].Equals("ID")){
-                    Console.WriteLine("ID를 입력하세요");
-                    nameID = Console.ReadLine()!;
+                    nameID = tokens[1].Trim();
                     
                     ClientService managerID = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim() };
                     jsonManager = JsonSerializer.Serialize(managerID, jso);
@@ -149,12 +161,12 @@ namespace AClient
                     Console.WriteLine("[전체전송]{0}", tokens[1]);
                     try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
                 }
+
                 else if (tokens[0].Equals("AC"))
                 {
                     ClientService managerAC = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = UserBRD[tokens[1].Trim()] };
                     jsonManager = JsonSerializer.Serialize(managerAC, jso);
 
-                    Console.WriteLine(jsonManager);
                     data = Encoding.Unicode.GetBytes(jsonManager);
                     Console.WriteLine("[AC 전송]{0}", tokens[1]);
                     try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
@@ -178,11 +190,13 @@ namespace AClient
         void UserSend()
         {
             clearConsole();
+            Console.WriteLine("ID를 먼저 입력해주세요!");
+
             byte[] dataID;
             string r = "user";
             string cd;
             string jsonUser;
-            nameID = "";
+            nameID = null;
 
 
             // JSON 직렬화 설정
@@ -193,17 +207,21 @@ namespace AClient
             do
             {
                 // 보내는 부분
-                Console.WriteLine($"유저 {nameID}님 방갑습니다!\n다음과 같은 포맷으로 메세지를 입력하세요\nex) 명령어! 보내고 싶은 메시지\n");
                 byte[] data;
                 string msg = Console.ReadLine()!;
                 string[] tokens = msg.Split('!');
                 string m;
 
+                if (nameID != null)
+                {
+                    // 보내는 부분
+                    Console.WriteLine($"매니저 {nameID}님 방갑습니다!\n다음과 같은 포맷으로 메세지를 입력하세요\nex) 명령어! 보내고 싶은 메시지\n");
+                }
 
                 if (tokens[0].Equals("ID"))
                 {
                     Console.WriteLine("ID를 입력하세요");
-                    nameID = Console.ReadLine()!;
+                    nameID = tokens[1];
 
                     ClientService userID = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim() };
                     jsonUser = JsonSerializer.Serialize(userID, jso);
@@ -230,6 +248,7 @@ namespace AClient
                     data = Encoding.Unicode.GetBytes(jsonUser);
                     try { ClientSocket.Send(data); } catch { }
                 }
+            
                 else
                 {
                     Console.WriteLine("잘못입력하셨습니다!");
@@ -262,21 +281,7 @@ namespace AClient
             Console.WriteLine("프로그램을 종료합니다!");
          
         }
-        void Information()
-        {
 
-            // JSON 직렬화 설정
-            JsonSerializerOptions jso = new JsonSerializerOptions();
-            jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-            jso.WriteIndented = true;
-
-
-            ClientService Info = new ClientService() {commend = "IF" };
-            String InfoD  = JsonSerializer.Serialize(Info, jso);
-
-            byte[] InfoByte = Encoding.Unicode.GetBytes(InfoD);
-            clientSocket.Send(InfoByte);
-        }
         void clearConsole()
         {
             Console.Clear();
