@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using System;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace AServer
 {
@@ -47,6 +48,8 @@ namespace AServer
             set => connectedManagers = value;
         }
 
+        // 받는 사람 , 보내는 사람 , 챗 내용 
+        public DualKeyDictionary<string, string, List<string>> RecodeUserChat = new DualKeyDictionary<string, string, List<string>>();
         private Socket ServerSocket;
 
         private readonly IPEndPoint EndPoint = new(IPAddress.Parse("127.0.0.1"), 5001);
@@ -180,23 +183,23 @@ namespace AServer
                 {
                     s.Send(Encoding.Unicode.GetBytes("IDC! 이미 존재하는 아이디입니다. 다시 입력하세요."));
                 }
-              
-              
+
+
             }
 
             else if (clientBody.commend == "BR")
             {
-                if(clientBody.roll == "manager")
+                if (clientBody.roll == "manager")
                 {
                     msg = clientBody.message;
                     Console.WriteLine("[전체]: {0}", msg);
                     UserBroadcast(s, msg);
                     s.Send(Encoding.Unicode.GetBytes("BR_Success: Manager"));
                 }
-                
+
                 else if (clientBody.roll == "user")
                 {
-                    msg =  clientBody.commend +"!"+ clientBody.id + "!" + clientBody.message;
+                    msg = clientBody.commend + "!" + clientBody.id + "!" + clientBody.message;
                     Console.WriteLine("[전체]: {0}", msg);
                     ManagerBroadcast(s, msg);
                     s.Send(Encoding.Unicode.GetBytes("매니저에게 BR를 요청했습니다."));
@@ -212,42 +215,81 @@ namespace AServer
             }
             else if (clientBody.commend == "TO")
             {
-                if(clientBody.roll == "manager")
-                
-                {
-                    fromID = clientBody.id;
-                    toID = clientBody.Toid;
-                    msg = clientBody.message;
-                    string rMsg = "[From:" + fromID + "]" + msg;
-                    Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
-                    SendTo(s, clientBody.roll ,toID, rMsg);
-                    s.Send(Encoding.Unicode.GetBytes("To_Success:"));
-                }
-                
-                else if (clientBody.roll == "user")
-                
+                if (clientBody.roll == "manager")
+
                 {
                     fromID = clientBody.id;
                     toID = clientBody.Toid;
                     msg = clientBody.message;
 
+                    string rMsg = "[From:" + fromID + "]" + msg;
+                    Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
+                    SendTo(s, clientBody.roll, toID, rMsg);
+                    s.Send(Encoding.Unicode.GetBytes("To_Success:"));
+                }
+
+                else if (clientBody.roll == "user")
+
+                {
+                    fromID = clientBody.id;
+                    toID = clientBody.Toid;
+                    msg = clientBody.message;
+
+                  
                     string rMsg = "[From:" + fromID + "]" + msg;
                     bMsg = $"{clientBody.commend}!{clientBody.roll}!{toID}!{fromID}!{msg}";
                     Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
-                    
+
                     SendTo(s, clientBody.roll, toID, rMsg);
                     ManagerBroadcast(s, bMsg);
-                    
-                }
-               
+                    try
+                    {
+                        List<string> tempMsg = new List<string>();
+                        if (RecodeUserChat.ContainsKey(fromID, toID) == false || RecodeUserChat[fromID, toID].Count <= 0)
+                        {
+                            tempMsg.Add(msg);
+                            RecodeUserChat.Add(fromID, toID, tempMsg);
+                        }
+                        else
+                        {
+                            tempMsg = RecodeUserChat[fromID, toID];
+                            tempMsg.Add(msg);
+                            RecodeUserChat.Add(fromID, toID, tempMsg);
 
+                        }
+                        
+                    }
+                    catch
+                    {
+                        Console.WriteLine("저장 실패");
+                    }
+
+
+                }
             }
-           
             else if (clientBody.commend == "INFO")
             {
                 msg = String.Join(", ", connectedUsers.Keys.ToArray());
-                s.Send(Encoding.Unicode.GetBytes(msg));                }
-                
+                s.Send(Encoding.Unicode.GetBytes(msg));
+            }
+
+            else if (clientBody.commend == "RC") {
+                // toID -> 받은 사람의 입장
+                // fromID -> 보내은 사람의 입장 
+                toID = clientBody.id;
+                fromID = clientBody.Toid;
+
+                try
+                {
+                    string RC = fromID + "님이 보낸 메세지 입니다.\n" + RecodeUserChat[fromID, toID].Aggregate((i, j) => i + "\n" + j).ToString();
+                    Console.WriteLine(RC);
+                    s.Send(Encoding.Unicode.GetBytes(RC));
+                }
+                catch { 
+                    s.Send(Encoding.Unicode.GetBytes("보낸 메세지가 없습니다!"));
+                }
+            }
+            
             else
             {
                 Broadcast(s, m);
@@ -273,7 +315,7 @@ namespace AServer
                     //
                     connectedUsers.TryGetValue(id, out socket!);
                     try { socket.Send(bytes); 
-                        us. Send(Encoding.Unicode.GetBytes("["+id+"]님에게 전송되었습니다."));
+                        us.Send(Encoding.Unicode.GetBytes("["+id+"]님에게 전송되었습니다."));
                     } catch { }
                 }
                 else
@@ -353,4 +395,95 @@ namespace AServer
 
     }
 
+    public class DualKeyDictionary<TKey1, TKey2, TValue> : Dictionary<TKey1, Dictionary<TKey2, TValue>>
+    {
+        //////////////////////////////////////////////////////////////////////////////////////////////////// Property
+        ////////////////////////////////////////////////////////////////////////////////////////// Public
+
+        #region 인덱서 - this[key1, key2]
+
+        /// <summary>
+        /// 인덱서
+        /// </summary>
+        /// <param name="key1">첫번째 키</param>
+        /// <param name="key2">두번째 키</param>
+        /// <returns>값</returns>
+        public TValue this[TKey1 key1, TKey2 key2]
+        {
+            get
+            {
+                if (!ContainsKey(key1) || !this[key1].ContainsKey(key2))
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                return base[key1][key2];
+            }
+            set
+            {
+                if (!ContainsKey(key1))
+                {
+                    this[key1] = new Dictionary<TKey2, TValue>();
+                }
+
+                this[key1][key2] = value;
+            }
+        }
+
+        #endregion
+        #region 값 열거형 - Values
+
+        /// <summary>
+        /// 값 열거형
+        /// </summary>
+        public new IEnumerable<TValue> Values
+        {
+            get
+            {
+                return from baseDictionary in base.Values
+                       from baseKey in baseDictionary.Keys
+                       select baseDictionary[baseKey];
+            }
+        }
+
+        #endregion
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////// Method
+        ////////////////////////////////////////////////////////////////////////////////////////// Public
+
+        #region 추가하기 - Add(key1, key2, value)
+
+        /// <summary>
+        /// 추가하기
+        /// </summary>
+        /// <param name="key1">첫번째 키</param>
+        /// <param name="key2">두번째 키</param>
+        /// <param name="value">값</param>
+        public void Add(TKey1 key1, TKey2 key2, TValue value)
+        {
+            if (!ContainsKey(key1))
+            {
+                this[key1] = new Dictionary<TKey2, TValue>();
+            }
+
+            this[key1][key2] = value;
+        }
+
+        #endregion
+        #region 키 포함 여부 구하기 - ContainsKey(key1, key2)
+
+        /// <summary>
+        /// 키 포함 여부 구하기
+        /// </summary>
+        /// <param name="key1">첫번째 키</param>
+        /// <param name="key2">두번쨰 키</param>
+        /// <returns>키 포함 여부</returns>
+        public bool ContainsKey(TKey1 key1, TKey2 key2)
+        {
+            return base.ContainsKey(key1) && this[key1].ContainsKey(key2);
+        }
+
+        #endregion
+    }
 }
+
