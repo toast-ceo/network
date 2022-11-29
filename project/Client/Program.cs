@@ -180,6 +180,14 @@ namespace AClient
                     Console.WriteLine("[{0}에게 전송]:{1}", tokens[1], tokens[2]);
                     try { ClientSocket.Send(data); } catch { }
                 }
+                else if (tokens[0].Equals("INFO"))
+                {
+                    ClientService managerInfo = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim() };
+                    jsonManager = JsonSerializer.Serialize(managerInfo, jso);
+                    data = Encoding.Unicode.GetBytes(jsonManager);
+                    Console.WriteLine("INFO 정보 요청");
+                    try { ClientSocket.Send(data); } catch { }
+                }
                 else
                 {
                     Console.WriteLine("잘못입력하셨습니다!");
@@ -221,7 +229,7 @@ namespace AClient
                 if (tokens[0].Equals("ID"))
                 {
                     Console.WriteLine("ID를 입력하세요");
-                    nameID = tokens[1];
+                    nameID = tokens[1].Trim();
 
                     ClientService userID = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim() };
                     jsonUser = JsonSerializer.Serialize(userID, jso);
@@ -248,7 +256,16 @@ namespace AClient
                     data = Encoding.Unicode.GetBytes(jsonUser);
                     try { ClientSocket.Send(data); } catch { }
                 }
-            
+
+                else if (tokens[0].Equals("INFO"))
+                {
+                    ClientService userInfo = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim() };
+                    jsonUser = JsonSerializer.Serialize(userInfo, jso);
+                    data = Encoding.Unicode.GetBytes(jsonUser);
+                    Console.WriteLine("INFO 정보 요청");
+                    try { ClientSocket.Send(data); } catch { }
+                }
+
                 else
                 {
                     Console.WriteLine("잘못입력하셨습니다!");

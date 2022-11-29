@@ -239,10 +239,15 @@ namespace AServer
                     ManagerBroadcast(s, bMsg);
                     
                 }
+               
 
             }
-            
-      
+           
+            else if (clientBody.commend == "INFO")
+            {
+                msg = String.Join(", ", connectedUsers.Keys.ToArray());
+                s.Send(Encoding.Unicode.GetBytes(msg));                }
+                
             else
             {
                 Broadcast(s, m);
@@ -253,7 +258,6 @@ namespace AServer
         {
             Socket socket;
             byte[] bytes = Encoding.Unicode.GetBytes(msg);
-            Console.WriteLine(id);
             if (roll == "manager")
             {
                 if (connectedClients.ContainsKey(id))
