@@ -279,6 +279,7 @@ namespace AClient
                     Console.WriteLine("INFO 정보 요청");
                     try { ClientSocket.Send(data); } catch { }
                 }
+               
                 else if (tokens[0].Equals("RC"))
                 {
                     ClientService userRC = new ClientService() { id = nameID,Toid = tokens[1].Trim(), roll = r, commend = tokens[0].Trim() };
@@ -287,10 +288,12 @@ namespace AClient
                     Console.WriteLine("RC 정보 요청");
                     try { ClientSocket.Send(data); } catch { }
                 }
+                
                 else if (tokens[0].Equals("CL"))
                 {
                     clearConsole();
                 }
+               
                 else
                 {
                     Console.WriteLine("잘못입력하셨습니다!");

@@ -186,7 +186,6 @@ namespace AServer
 
 
             }
-
             else if (clientBody.commend == "BR")
             {
                 if (clientBody.roll == "manager")
@@ -194,7 +193,7 @@ namespace AServer
                     msg = clientBody.message;
                     Console.WriteLine("[전체]: {0}", msg);
                     UserBroadcast(s, msg);
-                    s.Send(Encoding.Unicode.GetBytes("BR_Success: Manager"));
+                    s.Send(Encoding.Unicode.GetBytes("BR_완료 메세지"));
                 }
 
                 else if (clientBody.roll == "user")
@@ -211,7 +210,7 @@ namespace AServer
                 msg = clientBody.message;
                 Console.WriteLine("[전체]: {0}", msg);
                 UserBroadcast(s, msg);
-                s.Send(Encoding.Unicode.GetBytes("AC_Success: Manager"));
+                s.Send(Encoding.Unicode.GetBytes("AC 요청 완료"));
             }
             else if (clientBody.commend == "TO")
             {
@@ -225,7 +224,7 @@ namespace AServer
                     string rMsg = "[From:" + fromID + "]" + msg;
                     Console.WriteLine("[From:" + fromID + "] [To:" + toID + "]" + msg);
                     SendTo(s, clientBody.roll, toID, rMsg);
-                    s.Send(Encoding.Unicode.GetBytes("To_Success:"));
+                    s.Send(Encoding.Unicode.GetBytes("To 송신 완료"));
                 }
 
                 else if (clientBody.roll == "user")
@@ -242,6 +241,8 @@ namespace AServer
 
                     SendTo(s, clientBody.roll, toID, rMsg);
                     ManagerBroadcast(s, bMsg);
+                    s.Send(Encoding.Unicode.GetBytes("To 송신 완료"));
+
                     try
                     {
                         List<string> tempMsg = new List<string>();
@@ -272,7 +273,6 @@ namespace AServer
                 msg = String.Join(", ", connectedUsers.Keys.ToArray());
                 s.Send(Encoding.Unicode.GetBytes(msg));
             }
-
             else if (clientBody.commend == "RC") {
                 // toID -> 받은 사람의 입장
                 // fromID -> 보내은 사람의 입장 
@@ -289,7 +289,6 @@ namespace AServer
                     s.Send(Encoding.Unicode.GetBytes("보낸 메세지가 없습니다!"));
                 }
             }
-            
             else
             {
                 Broadcast(s, m);
@@ -306,7 +305,10 @@ namespace AServer
                 {
                     //
                     connectedClients.TryGetValue(id, out socket!);
-                    try { socket.Send(bytes); } catch { }
+                    try { socket.Send(bytes);
+                        us.Send(Encoding.Unicode.GetBytes("[" + id + "]님에게 전송되었습니다."));
+                    }
+                    catch { }
                 }
             }else if (roll == "user")
                 {
