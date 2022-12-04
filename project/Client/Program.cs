@@ -197,11 +197,19 @@ namespace AClient
                     Console.WriteLine("RC 정보 요청");
                     try { ClientSocket.Send(data); } catch { }
                 }
+               
+                else if (tokens[0].Equals("OUT"))
+                {
+                    ClientService managerOUT = new ClientService() { id = nameID, roll = r, commend = tokens[0].Trim(), message = tokens[1].Trim() };
+                    jsonManager = JsonSerializer.Serialize(managerOUT, jso);
+                    data = Encoding.Unicode.GetBytes(jsonManager);
+                    Console.WriteLine("[OUT 실행] : {0}님", tokens[1]);
+                    try { ClientSocket.Send(data); } catch { Console.WriteLine("잘못 입력하셨습니다!"); }
+                }
                 else if (tokens[0].Equals("CL"))
                 {
                     clearConsole();
                 }
-
                 else
                 {
                     Console.WriteLine("잘못입력하셨습니다!");
@@ -326,6 +334,7 @@ namespace AClient
             Console.WriteLine("프로그램을 종료합니다!");
          
         }
+       
 
         void clearConsole()
         {

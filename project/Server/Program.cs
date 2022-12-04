@@ -289,6 +289,27 @@ namespace AServer
                     s.Send(Encoding.Unicode.GetBytes("보낸 메세지가 없습니다!"));
                 }
             }
+            else if (clientBody.commend == "OUT")
+            {
+                string outID;
+                outID = clientBody.message;
+                try
+                {
+                    msg = outID + "님이 강퇴당하셨습니다.";
+                    Console.WriteLine($"Client disconnected: {connectedUsers[outID].RemoteEndPoint}.");
+                    connectedUsers[outID].Send(Encoding.Unicode.GetBytes("매니저님에 의해 강퇴당하셨습니다."));
+                    connectedClients.Remove(outID);
+                    connectedUsers.Remove(outID);
+                    clientNum--;
+                    Broadcast(s, msg);
+                    s.Send(Encoding.Unicode.GetBytes("OUT 처리 완료"));
+                }
+                catch
+                {
+                    s.Send(Encoding.Unicode.GetBytes("OUT 처리 실패"));
+                }
+               
+            }
             else
             {
                 Broadcast(s, m);
