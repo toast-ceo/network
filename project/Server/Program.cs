@@ -50,8 +50,8 @@ namespace AServer
 
         // 받는 사람 , 보내는 사람 , 챗 내용 
         public DualKeyDictionary<string, string, List<string>> RecodeUserChat = new DualKeyDictionary<string, string, List<string>>();
-        private Socket ServerSocket;
 
+        private Socket ServerSocket;
         private readonly IPEndPoint EndPoint = new(IPAddress.Parse("127.0.0.1"), 5001);
 
         int clientNum;
@@ -149,6 +149,7 @@ namespace AServer
 
         void MessageProc(Socket s, byte[] bytes)
         {
+            // 역직렬화 및 기타 설정
             string m = Encoding.Unicode.GetString(bytes);
             var clientBody  = JsonConvert.DeserializeObject<ClientService>(m);
             string msg;
