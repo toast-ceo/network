@@ -328,7 +328,7 @@ namespace AServer
                     //
                     connectedClients.TryGetValue(id, out socket!);
                     try { socket.Send(bytes);
-                        us.Send(Encoding.Unicode.GetBytes("[" + id + "]님에게 전송되었습니다."));
+                        us.Send(Encoding.Unicode.GetBytes("[" + id.Trim() + "]님에게 전송되었습니다."));
                     }
                     catch { }
                 }
@@ -339,7 +339,7 @@ namespace AServer
                     //
                     connectedUsers.TryGetValue(id, out socket!);
                     try { socket.Send(bytes); 
-                        us.Send(Encoding.Unicode.GetBytes("["+id+"]님에게 전송되었습니다."));
+                        us.Send(Encoding.Unicode.GetBytes("["+ id.Trim() + "]님에게 전송되었습니다."));
                     } catch { }
                 }
                 else
